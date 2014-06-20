@@ -63,4 +63,34 @@ describe Admin::CategoriesController do
     assert_raise(ActiveRecord::RecordNotFound) { Category.find(test_id) }
   end
   
+  # Test the creation of a new category in admin panel
+  # index redirect to action new
+  describe "new action" do
+    
+    # testing in view - level
+    it "should render an element of template new" do
+      get :new
+      response.body.should =~ /Categories/m
+    end
+    
+    describe "new action with POST" do
+      context "with valid attributes" do
+        it "creates a new category" do 
+          expect{ post :new, id: Factory(:category).id
+            }.to change(Category,:count).by(1) 
+        end
+
+        it "redirects to /index after created" do
+          post :new, id: Factory(:category).id
+          assert_response :redirect, :action => 'index'
+        end
+
+        it "shows a notification message after created" do
+          post :new, id: Factory(:category).id
+          flash[:notice].should =~ /Category was successfully saved./i
+        end
+      end
+    end
+  end
+
 end
