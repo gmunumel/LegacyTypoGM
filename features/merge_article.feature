@@ -15,7 +15,7 @@ Feature: Cannot Merge Articles
      | 2   | 3          | FoobarC 2 | LoremIpsumC 2 | Goo       |
 
   Scenario: A non-admin cannot merge two articles 
-    Given I am on the admin page 
+    Given I am on the admin page  
     And I should not see "Articles" on "Dashboard"
     And I should not see "New Article" on "Dashboard"
     #And show me the page
