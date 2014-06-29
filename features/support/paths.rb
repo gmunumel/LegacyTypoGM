@@ -15,9 +15,10 @@ module NavigationHelpers
 
     when /^the home\s?page$/
       '/'
+    when /^the admin page$/
+      '/admin'
     when /^the new article page$/
       '/admin/content/new'
-
     when /^the article page for "(.*)"$/i
        "admin/content/edit/#{Article.find_by_title($1).id}"
 
