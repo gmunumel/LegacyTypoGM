@@ -4,3 +4,17 @@
   <%= render :partial => "form" %>
 
 <% end %>
+
+<!-- Added by gabriel muñumel -->
+<%= form_tag(merge_form_action, :id => "#{merge_form_type}_form", :enctype => "multipart/form-data") do %>
+
+  <h3><%= _("Merge Articles")%></h3>
+    <div class='clearfix'>
+      <label for="article_id"><%= _("Article ID")%></label>
+      <div class='input'>
+        <%= text_field 'merge', 'with', :class => 'medium' %>
+      </div>
+    </div>
+  <%= save 'Merge' %>
+<% end %>
+

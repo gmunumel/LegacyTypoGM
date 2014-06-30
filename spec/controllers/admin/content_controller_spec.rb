@@ -695,19 +695,19 @@ describe Admin::ContentController do
       before :each do
         Factory(:blog)
         @user = Factory(:user, :profile => Factory(:profile_admin, :label => Profile::ADMIN))
-        @article_1 = Factory(:article, id: 1, title: "LoremIpsum", author: "Foo", body: "Hello World")
-        @article_2 = Factory(:article, id: 2, title: "LoremIpsum 2", author: "Goo", body: "Hello World 2")
+        @article_1 = Factory(:article, title: "LoremIpsum", author: "Foo", body: "Hello World")
+        @article_2 = Factory(:article, title: "LoremIpsum 2", author: "Goo", body: "Hello World 2")
         @comment_1 = Factory(:comment, body: "Comment 1", article: @article_2) 
         @comment_2 = Factory(:comment, body: "Comment 2", article: @article_2) 
         get :edit, :id => @article_1.id
       end
 
       it 'should merge two articles' do
-        art_1, art_2, com_1, com_2 = @article_1, @article_2, @comment_1, @comment_2
-        post :merge, 'merge_with' => art_2.id
+        art_1, art_2, com_1, com_2 = @article_1, @article_2, @comment_1, @comment_g
+        post :merge, id: art_1.id, merge_with: art_2.id
         response.should redirect_to(:action => 'index')
 
-        article = art_1.reload
+        article = art_1
         article.title.should == art_1.title << art_2.title 
         article.body.should == art_1.body << art_2.body 
         article.author.should == art_2.author 
@@ -718,9 +718,25 @@ describe Admin::ContentController do
         comment_2.article_id.should = art_1.id
       end
 
-      it 'should not merge equal articles'
+      it 'should receive the correct arguments' do
+        Content.should_receive(:merge).
+          with(hash_including(id: @article_1.id, merge_with: @article_2.id)).
+          and_return(true)
+      end
 
-      it 'should not merge non-exiting articles'
+      it 'should raise an EqualKeyError when two articles with the same key' do
+        Article.stub(:merge).
+          with(hash_including(id: @article_1.id, merge_with: @article_1.id)).
+          and_raise(RuntimeError.new("API returned status code '404'"))
+        lambda { Content.merge }.should raise_error(Article::EqualKeyError)
+      end
+
+      it 'should not merge non-exiting articles' do
+        Article.stub(:merge).
+          and_raise(RuntimeError.new("API returned status code '404'"))
+        lambda { Content.merge }.should raise_error(Article::NoneKeyError)
+      end
+ 
     end
   end
 end

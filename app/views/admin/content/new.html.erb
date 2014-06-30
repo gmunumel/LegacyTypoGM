@@ -1,3 +1,15 @@
 <% @page_heading = _('New article') %>
 
-<%= render "admin/shared/edit", { :form_type => "article", :form_action => { :action => "new", :id => @article.id , :class => ('autosave')} } %>
+<%= render "admin/shared/edit", { 
+  :form_type => "article", 
+  :form_action => { 
+                    :action => "new", 
+                    :id => @article.id, 
+                    :class => ('autosave')
+                  },
+  :merge_form_type => "merge_article",
+  :merge_form_action => {
+                    :action => "merge",
+                    :id => @article.id
+                  }
+} %>
