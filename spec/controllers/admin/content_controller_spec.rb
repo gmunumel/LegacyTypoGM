@@ -1,4 +1,4 @@
- require 'spec_helper'
+require 'spec_helper'
 
 describe Admin::ContentController do
   render_views
@@ -669,6 +669,58 @@ describe Admin::ContentController do
         end.should_not change(Article, :count)
       end
 
+    end
+  end
+  
+  #added by gabriel muñumel
+  describe 'merge action' do
+
+    describe 'with non-admin connection' do
+
+      before :each do
+        Factory(:blog)
+        @user = Factory(:user, :profile => Factory(:profile_contributor))
+        @article = Factory(:article, :user => @user)
+        request.session = {:user => @user.id}
+      end
+
+      it 'should not render index' do
+        get 'index'
+        response.should_not render_template('index')
+      end
+    end
+
+    describe 'with admin connection' do
+
+      before :each do
+        Factory(:blog)
+        @user = Factory(:user, :profile => Factory(:profile_admin, :label => Profile::ADMIN))
+        @article_1 = Factory(:article, id: 1, title: "LoremIpsum", author: "Foo", body: "Hello World")
+        @article_2 = Factory(:article, id: 2, title: "LoremIpsum 2", author: "Goo", body: "Hello World 2")
+        @comment_1 = Factory(:comment, body: "Comment 1", article: @article_2) 
+        @comment_2 = Factory(:comment, body: "Comment 2", article: @article_2) 
+        get :edit, :id => @article_1.id
+      end
+
+      it 'should merge two articles' do
+        art_1, art_2, com_1, com_2 = @article_1, @article_2, @comment_1, @comment_2
+        post :merge, 'merge_with' => art_2.id
+        response.should redirect_to(:action => 'index')
+
+        article = art_1.reload
+        article.title.should == art_1.title << art_2.title 
+        article.body.should == art_1.body << art_2.body 
+        article.author.should == art_2.author 
+
+        comment_1 = com_1.reload
+        comment_2 = com_2.reload
+        comment_1.article_id.should = art_1.id
+        comment_2.article_id.should = art_1.id
+      end
+
+      it 'should not merge equal articles'
+
+      it 'should not merge non-exiting articles'
     end
   end
 end

@@ -35,7 +35,7 @@ Feature: Merge Articles
     #And show me the page
     And I fill in "merge_with" with "3"
     And I press "Merge"
-    Then the article "Foobar" should have author "Foo" 
+    Then the article "Foobar" should have author "Goo" 
     #And show me the page
 
   Scenario: Successfully merge articles by title

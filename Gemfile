@@ -52,7 +52,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 2.0'
   gem 'simplecov', :require => false
   gem 'sqlite3'
-  gem 'minitest'
+  gem 'minitest', '~> 4.0'
   gem 'cucumber'
   gem 'cucumber-rails', :require => false
   gem 'cucumber-rails-training-wheels'
