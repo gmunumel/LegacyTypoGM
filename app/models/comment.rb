@@ -31,6 +31,13 @@ class Comment < Feedback
   def feed_title
     "Comment on #{article.title} by #{author}"
   end
+  
+  # added by gabriel muñumel
+  # function to merge two comments
+  def self.merge(id, merge_id)
+    com_merge = self.find_by_article_id(merge_id)
+    self.create com_merge.update(article_id: id) if not com_merge.blank?
+  end
 
   protected
 

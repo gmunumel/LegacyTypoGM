@@ -699,6 +699,7 @@ describe Admin::ContentController do
         @article_2 = Factory(:article, title: "LoremIpsum 2", author: "Goo", body: "Hello World 2")
         @comment_1 = Factory(:comment, body: "Comment 1", article: @article_2) 
         @comment_2 = Factory(:comment, body: "Comment 2", article: @article_2) 
+        request.session = {:user => @user.id}
         get :edit, :id => @article_1.id
       end
 
@@ -707,7 +708,7 @@ describe Admin::ContentController do
         post :merge, id: art_1.id, merge_with: art_2.id
         response.should redirect_to(:action => 'index')
 
-        article = art_1
+        article = art_1.reload
         article.title.should == art_1.title << art_2.title 
         article.body.should == art_1.body << art_2.body 
         article.author.should == art_2.author 
@@ -719,22 +720,21 @@ describe Admin::ContentController do
       end
 
       it 'should receive the correct arguments' do
-        Content.should_receive(:merge).
+        Article.should_receive(:merge).
           with(hash_including(id: @article_1.id, merge_with: @article_2.id)).
           and_return(true)
       end
 
-      it 'should raise an EqualKeyError when two articles with the same key' do
-        Article.stub(:merge).
-          with(hash_including(id: @article_1.id, merge_with: @article_1.id)).
-          and_raise(RuntimeError.new("API returned status code '404'"))
-        lambda { Content.merge }.should raise_error(Article::EqualKeyError)
+      it 'should raise an EqualKeyError when two articles with the same id' do
+        lambda {
+            Article.merge(@article_1.id, @article_1.id)
+        }.should raise_error(Article::EqualKeyError)
       end
 
       it 'should not merge non-exiting articles' do
-        Article.stub(:merge).
-          and_raise(RuntimeError.new("API returned status code '404'"))
-        lambda { Content.merge }.should raise_error(Article::NoneKeyError)
+        lambda {
+            Article.merge('', 999)
+        }.should raise_error(Article::InvalidKeyError)
       end
  
     end

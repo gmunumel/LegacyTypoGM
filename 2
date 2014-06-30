@@ -30,14 +30,10 @@ class Admin::ContentController < Admin::BaseController
   # added by gabriel muñumel
   # action to merge two articles
   def merge 
+    debugger
     id = params[:id]
-    merge_id = params[:merge_with]
-    Article.merge id, merge_id
-    Comment.merge id, merge_id
-
-    flash[:notice] = _("This article was merged successfully")
-    redirect_to :action => 'index'
-
+    merge = params[:merge_with]
+    
   end
 
   def edit

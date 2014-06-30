@@ -416,6 +416,31 @@ class Article < Content
     user.admin? || user_id == user.id
   end
 
+
+  # added by gabriel muñumel
+  # function two merge two articles
+  class Article::InvalidKeyError < StandardError; end
+  class Article::EqualKeyError < StandardError; end
+
+  def self.merge(id, merge_id)
+    raise Article::EqualKeyError, "Error: cannot merge articles with the same id" if id == merge_id
+    raise Article::InvalidKeyError, "Error: cannot merge articles without id" if id.blank? or merge_id.blank?
+   
+    art = self.find(id)
+    begin
+      art_merge = self.find(merge_id)
+    rescue ArgumentError 
+      raise Article::InvalidKeyError, "Error: invalid argument merge id"
+    rescue RecordNotFound
+      raise Article::InvalidKeyError, "Error: not record found with merge id"
+    end 
+   
+    title = art.title << " " << art_merge.title
+    body = art.body << " " << art_merge.body
+    author = art_merge.author
+    self.find(id).update(title: title, body: body, author: author)
+  end
+
   protected
 
   def set_published_at
