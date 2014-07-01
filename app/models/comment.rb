@@ -34,14 +34,18 @@ class Comment < Feedback
   
   # added by gabriel muñumel
   # function to merge two comments
-  def self.merge(id, merge_id)
-    com_merge = self.find_by_article_id(merge_id)
-    if com_merge.blank?
-      []
-    else
-      com_merge.attributes = {article_id: id} 
-      com_merge.attributes
-    end
+  class Comment::InvalidKeyError < StandardError; end
+  class Comment::EqualKeyError < StandardError; end
+
+  def merge_with(merge_id)
+    raise Comment::EqualKeyError, "Error: cannot merge comments with the same id" if self.id == merge_id
+    raise Comment::InvalidKeyError, "Error: cannot merge comments without id" if self.id.blank? or merge_id.blank?
+
+      com_id = Comment.find(:all, :conditions => [ "article_id = ?", self.id])
+      com_merge_id = Comment.find(:all, :conditions => [ "article_id = ?", merge_id])
+    comment = com_merge_id
+    comment = com_id.zip(com_merge_id).flatten.compact unless com_id.empty?
+    comment
   end
 
   protected

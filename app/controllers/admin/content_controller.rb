@@ -32,10 +32,14 @@ class Admin::ContentController < Admin::BaseController
   def merge 
     id = params[:id]
     merge_id = params[:merge_with]
-    @article = Article.merge id, merge_id
+    @article = Article.find(id).merge_with merge_id
+    @article.user_id = current_user
+    @article.state = "published"
     @article.save
-    @comment = Comment.merge id, merge_id
-    Comment.create(@comment) unless @comment.blank?
+    @comment = Comment.find(id).merge_with merge_id
+    @comment.map { |i| i.attributes = { article_id:  @article.id }}
+    @comment.map! { |i| i.attributes }
+    Comment.create(@comment) unless @comment.empty?
 
     flash[:notice] = _("This article was merged successfully")
     redirect_to :action => 'index'
@@ -203,7 +207,7 @@ class Admin::ContentController < Admin::BaseController
     when 'new'
       flash[:notice] = _('Article was successfully created')
     when 'edit'
-      flash[:notice] = _('Article was successfully updated.')
+      fmerge_idlash[:notice] = _('Article was successfully updated.')
     else
       raise "I don't know how to tidy up action: #{params[:action]}"
     end
