@@ -438,7 +438,8 @@ class Article < Content
     title = art.title << " " << art_merge.title
     body = art.body << " " << art_merge.body
     author = art_merge.author
-    self.find(id).update(title: title, body: body, author: author)
+    art.attributes = {title: title, body: body, author: author}
+    art
   end
 
   protected

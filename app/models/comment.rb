@@ -36,7 +36,12 @@ class Comment < Feedback
   # function to merge two comments
   def self.merge(id, merge_id)
     com_merge = self.find_by_article_id(merge_id)
-    self.create com_merge.update(article_id: id) if not com_merge.blank?
+    if com_merge.blank?
+      []
+    else
+      com_merge.attributes = {article_id: id} 
+      com_merge.attributes
+    end
   end
 
   protected

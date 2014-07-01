@@ -700,7 +700,6 @@ describe Admin::ContentController do
         @comment_1 = Factory(:comment, body: "Comment 1", article: @article_2) 
         @comment_2 = Factory(:comment, body: "Comment 2", article: @article_2) 
         request.session = {:user => @user.id}
-        get :edit, :id => @article_1.id
       end
 
       it 'should merge two articles' do
@@ -708,21 +707,15 @@ describe Admin::ContentController do
         post :merge, id: art_1.id, merge_with: art_2.id
         response.should redirect_to(:action => 'index')
 
-        article = art_1.reload
-        article.title.should == art_1.title << art_2.title 
-        article.body.should == art_1.body << art_2.body 
+        article = @article_1.reload
+        article.title.should == art_1.title << " " << art_2.title 
+        article.body.should == art_1.body << " " << art_2.body 
         article.author.should == art_2.author 
 
-        comment_1 = com_1.reload
-        comment_2 = com_2.reload
-        comment_1.article_id.should = art_1.id
-        comment_2.article_id.should = art_1.id
-      end
-
-      it 'should receive the correct arguments' do
-        Article.should_receive(:merge).
-          with(hash_including(id: @article_1.id, merge_with: @article_2.id)).
-          and_return(true)
+        comment_1 = @comment_1.reload
+        comment_2 = @comment_2.reload
+        comment_1.article_id.should == art_1.id
+        comment_2.article_id.should == art_1.id
       end
 
       it 'should raise an EqualKeyError when two articles with the same id' do

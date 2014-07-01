@@ -32,8 +32,10 @@ class Admin::ContentController < Admin::BaseController
   def merge 
     id = params[:id]
     merge_id = params[:merge_with]
-    Article.merge id, merge_id
-    Comment.merge id, merge_id
+    @article = Article.merge id, merge_id
+    @article.save
+    @comment = Comment.merge id, merge_id
+    Comment.create(@comment) unless @comment.blank?
 
     flash[:notice] = _("This article was merged successfully")
     redirect_to :action => 'index'
