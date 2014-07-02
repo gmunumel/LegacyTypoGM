@@ -679,7 +679,6 @@ describe Admin::ContentController do
 
       before :each do
         Factory(:blog)
-        #@user = Factory(:user, :profile => Factory(:profile_publisher))
         @user = Factory(:user, :profile => Factory(:profile_publisher))
         debugger
         @user.profile_id = 2

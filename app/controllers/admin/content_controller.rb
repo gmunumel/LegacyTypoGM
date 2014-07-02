@@ -30,26 +30,19 @@ class Admin::ContentController < Admin::BaseController
   # added by gabriel muñumel
   # action to merge two articles
   def merge 
-    if request.post?
-      id = params[:id]
-      merge_id = params[:merge_with]
-      @article = Article.merge_with id, merge_id
-      @article.user_id = current_user
-      @article.state = "published"
-      @article.save
-      @comment = Comment.merge_with id, merge_id
-      @comment.map { |i| i.attributes = { article_id:  @article.id }}
-      @comment.map! { |i| i.attributes }
-      Comment.create(@comment) unless @comment.empty?
+    id = params[:id]
+    merge_id = params[:merge_with]
+    @article = Article.merge_with id, merge_id
+    @article.user_id = current_user
+    @article.state = "published"
+    @article.save
+    @comment = Comment.merge_with id, merge_id
+    @comment.map { |i| i.attributes = { article_id:  @article.id }}
+    @comment.map! { |i| i.attributes }
+    Comment.create(@comment) unless @comment.empty?
 
-      flash[:notice] = _("This article was merged successfully")
-      redirect_to :action => 'index'
-    else
-      #@profile_admin = lambda{current_user.profile_id == 1}.call
-      if current_user.profile_id == 1
-        render :partial => '/admin/shared/merge' 
-      end
-    end
+    flash[:notice] = _("This article was merged successfully")
+    redirect_to :action => 'index'
   end
 
   def edit
@@ -59,7 +52,6 @@ class Admin::ContentController < Admin::BaseController
       flash[:error] = _("Error, you are not allowed to perform this action")
       return
     end
-    merge
     new_or_edit
   end
 
@@ -166,6 +158,9 @@ class Admin::ContentController < Admin::BaseController
   def real_action_for(action); { 'add' => :<<, 'remove' => :delete}[action]; end
 
   def new_or_edit
+    # added by gabriel munumel
+    @profile_admin = lambda{current_user.profile_id == 1}.call
+    # end
     id = params[:id]
     id = params[:article][:id] if params[:article] && params[:article][:id]
     @article = Article.get_or_build_article(id)

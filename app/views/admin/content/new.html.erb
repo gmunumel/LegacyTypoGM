@@ -9,8 +9,7 @@
                   }
 } %>
 
-<%
-=begin %>
+<% if @profile_admin %>
 <%= render "admin/shared/merge", { 
   :merge_form_type => "merge_article",
   :merge_form_action => {
@@ -18,5 +17,4 @@
                     :id => @article.id
                   }
 } %>
-<%
-=end %>
+<% end %>
