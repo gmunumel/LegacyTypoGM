@@ -46,6 +46,9 @@ class Admin::ContentController < Admin::BaseController
   end
 
   def edit
+    # added by gabriel muñumel
+    @profile_admin = lambda{current_user.profile_id == 3}.call
+    # end 
     @article = Article.find(params[:id])
     unless @article.access_by? current_user
       redirect_to :action => 'index'

@@ -679,14 +679,15 @@ describe Admin::ContentController do
 
       before :each do
         Factory(:blog)
-        @user = Factory(:user, :profile => Factory(:profile_contributor))
+        @user = Factory(:user, :profile => Factory(:profile_publisher))
         @article = Factory(:article, :user => @user)
         request.session = {:user => @user.id}
       end
 
       it 'should not render index' do
-        get 'index'
-        response.should_not render_template('index')
+        get 'edit', 'id' => @article.id
+        response.should render_template('edit')
+        response.body.should_not include 'Merge Articles'
       end
     end
 
@@ -735,6 +736,12 @@ describe Admin::ContentController do
       it 'should create an article with a redirect' do
         post :merge, id: @article_1.id, merge_with: @article_2.id
         assigns(:article).redirects.count.should == 1
+      end
+
+      it 'should create a single article' do
+        Article.count.should be == 2
+        post :merge, id: @article_1.id, merge_with: @article_2.id
+        Article.count.should be == 3
       end
 
       it 'should raise an EqualKeyError when two articles have the same id' do

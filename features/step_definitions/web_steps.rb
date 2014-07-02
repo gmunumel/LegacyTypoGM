@@ -42,17 +42,17 @@ Given /^the blog is set up$/ do
                 :name => 'admin',
                 :state => 'active'})
 
-  User.create!({:login => 'regular',
+  User.create!({:login => 'publisher',
                 :password => 'aaaaaaaa',
-                :email => 'regular@me.com',
-                :profile_id => 3,
-                :name => 'regular',
+                :email => 'publisher@me.com',
+                :profile_id => 2, # publisher
+                :name => 'publisher',
                 :state => 'active'})
 end
 
 And /^I am logged as a non-admin user$/ do
   visit '/accounts/login'
-  fill_in 'user_login', :with => 'regular'
+  fill_in 'user_login', :with => 'publisher'
   fill_in 'user_password', :with => 'aaaaaaaa'
   click_button 'Login'
   if page.respond_to? :should
