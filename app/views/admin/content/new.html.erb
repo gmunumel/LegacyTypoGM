@@ -6,10 +6,17 @@
                     :action => "new", 
                     :id => @article.id, 
                     :class => ('autosave')
-                  },
+                  }
+} %>
+
+<%
+=begin %>
+<%= render "admin/shared/merge", { 
   :merge_form_type => "merge_article",
   :merge_form_action => {
                     :action => "merge",
                     :id => @article.id
                   }
 } %>
+<%
+=end %>

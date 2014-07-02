@@ -30,31 +30,36 @@ class Admin::ContentController < Admin::BaseController
   # added by gabriel muñumel
   # action to merge two articles
   def merge 
-    id = params[:id]
-    merge_id = params[:merge_with]
-    @article = Article.merge_with id, merge_id
-    @article.user_id = current_user
-    @article.state = "published"
-    @article.save
-    @comment = Comment.merge_with id, merge_id
-    @comment.map { |i| i.attributes = { article_id:  @article.id }}
-    @comment.map! { |i| i.attributes }
-    Comment.create(@comment) unless @comment.empty?
+    if request.post?
+      id = params[:id]
+      merge_id = params[:merge_with]
+      @article = Article.merge_with id, merge_id
+      @article.user_id = current_user
+      @article.state = "published"
+      @article.save
+      @comment = Comment.merge_with id, merge_id
+      @comment.map { |i| i.attributes = { article_id:  @article.id }}
+      @comment.map! { |i| i.attributes }
+      Comment.create(@comment) unless @comment.empty?
 
-    flash[:notice] = _("This article was merged successfully")
-    redirect_to :action => 'index'
+      flash[:notice] = _("This article was merged successfully")
+      redirect_to :action => 'index'
+    else
+      #@profile_admin = lambda{current_user.profile_id == 1}.call
+      if current_user.profile_id == 1
+        render :partial => '/admin/shared/merge' 
+      end
+    end
   end
 
   def edit
-    # added by gabriel muñumel
-    @profile_admin = lambda{current_user.profile_id == 3}.call
-    # end 
     @article = Article.find(params[:id])
     unless @article.access_by? current_user
       redirect_to :action => 'index'
       flash[:error] = _("Error, you are not allowed to perform this action")
       return
     end
+    merge
     new_or_edit
   end
 

@@ -679,13 +679,17 @@ describe Admin::ContentController do
 
       before :each do
         Factory(:blog)
+        #@user = Factory(:user, :profile => Factory(:profile_publisher))
         @user = Factory(:user, :profile => Factory(:profile_publisher))
+        debugger
+        @user.profile_id = 2
         @article = Factory(:article, :user => @user)
         request.session = {:user => @user.id}
       end
 
       it 'should not render index' do
         get 'edit', 'id' => @article.id
+        debugger
         response.should render_template('edit')
         response.body.should_not include 'Merge Articles'
       end

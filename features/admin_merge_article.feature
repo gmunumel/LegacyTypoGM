@@ -17,12 +17,6 @@ Feature: Merge Articles
      | 1   | Foobar     | LoremIpsumC   | Foo       |
      | 2   | Foobar 2   | LoremIpsumC_2 | Goo       |
 
-  Scenario: Admin can merge two articles 
-    Given I am on the admin page 
-    And I should see "Articles" on "Dashboard"
-    And I should see "New Article" on "Dashboard"
-    #And show me the page
-
   Scenario: Successfully merge articles by body
     Given I am on the article page for "Foobar"
     And I fill in "merge_with" with "4"
