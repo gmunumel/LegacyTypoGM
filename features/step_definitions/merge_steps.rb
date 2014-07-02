@@ -1,15 +1,10 @@
 Given /^the following articles exist$/ do |table|  
-  @article = []
-  table.hashes.each do |item|
-    art = Article.new item
-    @article << art
-    art.save!
-  end
+  Article.create table.hashes
 end  
 
 Given /^the following comments exist$/ do |table|  
-  Comment.create table.hashes.map { |i| i.merge(article: @article[i["article_id"].to_i - 3]) }
-end  
+  Comment.create table.hashes.map { |i| i.merge(article: Article.find_by_title(i["title"])) }
+end
 
 Then /^the article "(.*?)" should have body "(.*?)"$/ do |title, body|    
   Article.find_by_title(title).body.should eq body

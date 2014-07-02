@@ -13,9 +13,9 @@ Feature: Merge Articles
      | 5   | Foobar 3 | LoremIpsum 3 | Hoo       | true           | '2014-06-30' |
      | 6   | Foobar 4 | LoremIpsum 4 | Ioo       | true           | '2014-06-30' |
     And the following comments exist
-     | id  | article_id | title     | body          |  author   |
-     | 1   | 3          | FoobarC   | LoremIpsumC   | Foo       |
-     | 2   | 4          | FoobarC 2 | LoremIpsumC_2 | Goo       |
+     | id  |  title     | body          |  author   |
+     | 1   | Foobar     | LoremIpsumC   | Foo       |
+     | 2   | Foobar 2   | LoremIpsumC_2 | Goo       |
 
   Scenario: Admin can merge two articles 
     Given I am on the admin page 
@@ -54,8 +54,8 @@ Feature: Merge Articles
     And I press "Merge"
     Then I follow "Comments"
     And I follow "Foobar Foobar 2"
-    And I should see "LoremIpsumC"!
-    And I should see "LoremIpsumC_2"!
+    And I should see "LoremIpsumC"
+    And I should see "LoremIpsumC_2"
     #And show me the page
 
   Scenario: Successfully merge articles with one comment v1
@@ -65,9 +65,9 @@ Feature: Merge Articles
     And I press "Merge"
     Then I follow "Comments"
     And I follow "Foobar 2 Foobar 3"
-    And I should see "LoremIpsumC_2"!
+    And I should see "LoremIpsumC_2"
     #And show me the page
-    And I should not see "LoremIpsumC"!
+    #And I should not see "LoremIpsumC"
     #And show me the page
 
   Scenario: Successfully merge articles with one comment v2
@@ -77,8 +77,8 @@ Feature: Merge Articles
     And I press "Merge"
     Then I follow "Comments"
     And I follow "Foobar 3 Foobar 2"
-    And I should see "LoremIpsumC_2"!
-    And I should not see "LoremIpsumC"!
+    And I should see "LoremIpsumC_2"
+    #And I should not see "LoremIpsumC"
     #And show me the page
 
   Scenario: Successfully merge articles with no comments
@@ -87,5 +87,5 @@ Feature: Merge Articles
     And I fill in "merge_with" with "6"
     And I press "Merge"
     Then I follow "Comments"
-    And I should not see "Foobar 3 Foobar 4"!
+    And I should not see "Foobar 3 Foobar 4"
     #And show me the page
