@@ -40,6 +40,8 @@ class Admin::ContentController < Admin::BaseController
     @comment.map { |i| i.attributes = { article_id:  @article.id }}
     @comment.map! { |i| i.attributes }
     Comment.create(@comment) unless @comment.empty?
+    Article.find(id).destroy
+    Article.find(merge_id).destroy
 
     flash[:notice] = _("This article was merged successfully")
     redirect_to :action => 'index'

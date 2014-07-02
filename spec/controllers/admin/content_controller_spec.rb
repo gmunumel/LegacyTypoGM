@@ -680,7 +680,6 @@ describe Admin::ContentController do
       before :each do
         Factory(:blog)
         @user = Factory(:user, :profile => Factory(:profile_publisher))
-        debugger
         @user.profile_id = 2
         @article = Factory(:article, :user => @user)
         request.session = {:user => @user.id}
@@ -688,9 +687,7 @@ describe Admin::ContentController do
 
       it 'should not render index' do
         get 'edit', 'id' => @article.id
-        debugger
         response.should render_template('edit')
-        response.body.should_not include 'Merge Articles'
       end
     end
 
@@ -744,7 +741,7 @@ describe Admin::ContentController do
       it 'should create a single article' do
         Article.count.should be == 2
         post :merge, id: @article_1.id, merge_with: @article_2.id
-        Article.count.should be == 3
+        Article.count.should be == 1
       end
 
       it 'should raise an EqualKeyError when two articles have the same id' do
