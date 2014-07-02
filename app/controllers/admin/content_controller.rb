@@ -32,18 +32,17 @@ class Admin::ContentController < Admin::BaseController
   def merge 
     id = params[:id]
     merge_id = params[:merge_with]
-    @article = Article.find(id).merge_with merge_id
+    @article = Article.merge_with id, merge_id
     @article.user_id = current_user
     @article.state = "published"
     @article.save
-    @comment = Comment.find(id).merge_with merge_id
+    @comment = Comment.merge_with id, merge_id
     @comment.map { |i| i.attributes = { article_id:  @article.id }}
     @comment.map! { |i| i.attributes }
     Comment.create(@comment) unless @comment.empty?
 
     flash[:notice] = _("This article was merged successfully")
     redirect_to :action => 'index'
-
   end
 
   def edit

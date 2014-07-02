@@ -171,6 +171,24 @@ Then /^(?:|I )should not see "([^"]*)"$/ do |text|
   end
 end
 
+# Added by gabriel munumel
+Then /^(?:|I )should see "([^"]*)"!$/ do |text|
+  if page.body.respond_to? :should
+    page.body.should have_xpath("//p", :text => "#{text}") 
+  else
+    assert page.body.has_xpath?("//p", :text => "#{text}")
+  end
+end
+
+Then /^(?:|I )should not see "([^"]*)"!$/ do |text|
+  if page.body.respond_to? :should
+    debugger
+    page.body.should_not have_xpath("//p", :text => "#{text}") 
+  else
+    assert page.body.has_xpath?("//p", :text => "#{text}")
+  end
+end
+
 Then /^(?:|I )should not see \/([^\/]*)\/$/ do |regexp|
   regexp = Regexp.new(regexp)
 

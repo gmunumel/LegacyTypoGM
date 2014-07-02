@@ -697,33 +697,39 @@ describe Admin::ContentController do
         @user = Factory(:user, :profile => Factory(:profile_admin, :label => Profile::ADMIN))
         @article_1 = Factory(:article, title: "LoremIpsum", author: "Foo", body: "Hello World")
         @article_2 = Factory(:article, title: "LoremIpsum 2", author: "Goo", body: "Hello World 2")
-        @comment_1 = Factory(:comment, body: "Comment 1", article: @article_2) 
-        @comment_2 = Factory(:comment, body: "Comment 2", article: @article_2) 
         request.session = {:user => @user.id}
       end
 
-      it 'should create a new article with the merge of two articles' do
-        art_1, art_2, com_1, com_2 = @article_1, @article_2, @comment_1, @comment_g
+      def article_check
+        art_1, art_2 = @article_1, @article_2
         post :merge, id: art_1.id, merge_with: art_2.id
         response.should redirect_to(:action => 'index')
         assigns(:article).should be_published
         assigns(:article).title.should == art_1.title << " " << art_2.title 
         assigns(:article).body.should == art_1.body << " " << art_2.body
         assigns(:article).author.should == art_2.author
+      end
+      
+      it 'should create a new article with the merge of two articles' do
+        @comment_1 = Factory(:comment, body: "Comment 1", article: @article_2) 
+        @comment_2 = Factory(:comment, body: "Comment 2", article: @article_2) 
+        article_check
 
-        assigns(:comment).first["article_id"].should == art_1.id
-        assigns(:comment).last["article_id"].should == art_1.id
-=begin
-        article = @article_1.reload
-        article.title.should == art_1.title << " " << art_2.title 
-        article.body.should == art_1.body << " " << art_2.body 
-        article.author.should == art_2.author 
+        assigns(:comment).first["article_id"].should == assigns(:article).id
+        assigns(:comment).last["article_id"].should == assigns(:article).id 
+      end
 
-        comment_1 = @comment_1.reload
-        comment_2 = @comment_2.reload
-        comment_1.article_id.should == art_1.id
-        comment_2.article_id.should == art_1.id
-=end
+      it 'should create a new article with no comments' do
+        article_check
+
+        assigns(:comment).should == []
+      end
+
+      it 'should create a new article with one comment' do
+        @comment_1 = Factory(:comment, body: "Comment 1", article: @article_2) 
+        article_check
+
+        assigns(:comment).first["article_id"].should == assigns(:article).id
       end
 
       it 'should create an article with a redirect' do
@@ -733,28 +739,27 @@ describe Admin::ContentController do
 
       it 'should raise an EqualKeyError when two articles have the same id' do
         lambda {
-            Article.find(@article_1.id).merge_with(@article_1.id)
+            Article.merge_with(@article_1.id, @article_1.id)
         }.should raise_error(Article::EqualKeyError)
       end
 
       it 'should not merge non-exiting articles' do
         lambda {
-            lambda{
-              Article.find(-1)
-            }.should raise_error(ActiveRecord::RecordNotFound)
-            Article.find(@article_1.id).merge_with(-1)
+          Article.merge_with(@article_1.id, -1)
         }.should raise_error(Article::InvalidKeyError)
       end
  
       it 'should raise an EqualKeyError when two comments with the same id' do
+        @comment_1 = Factory(:comment, body: "Comment 1", article: @article_2) 
         lambda {
-            Comment.find(@comment_1.id).merge_with(@comment_1.id)
+          Comment.merge_with(@comment_1.id, @comment_1.id)
         }.should raise_error(Comment::EqualKeyError)
       end
 
       it 'should not merge non-exiting comments' do
-          Comment.find(-1).stub(:merge_with).with(-1).and_return([])
-      end     
+        @comment_1 = Factory(:comment, body: "Comment 1", article: @article_2) 
+        Comment.merge_with(@comment_1.id, -1).should eq([])
+      end
     end
   end
 end

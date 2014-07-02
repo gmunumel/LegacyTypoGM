@@ -1,12 +1,14 @@
 Given /^the following articles exist$/ do |table|  
+  @article = []
   table.hashes.each do |item|
-    @article = Article.new item
-    @article.save!
+    art = Article.new item
+    @article << art
+    art.save!
   end
 end  
 
 Given /^the following comments exist$/ do |table|  
-  Comment.create table.hashes.map { |i| i.merge(article: @article) }
+  Comment.create table.hashes.map { |i| i.merge(article: @article[i["article_id"].to_i - 3]) }
 end  
 
 Then /^the article "(.*?)" should have body "(.*?)"$/ do |title, body|    

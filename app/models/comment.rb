@@ -37,11 +37,11 @@ class Comment < Feedback
   class Comment::InvalidKeyError < StandardError; end
   class Comment::EqualKeyError < StandardError; end
 
-  def merge_with(merge_id)
-    raise Comment::EqualKeyError, "Error: cannot merge comments with the same id" if self.id == merge_id
-    raise Comment::InvalidKeyError, "Error: cannot merge comments without id" if self.id.blank? or merge_id.blank?
+  def self.merge_with(id, merge_id)
+    raise Comment::EqualKeyError, "Error: cannot merge comments with the same id" if id == merge_id
+    raise Comment::InvalidKeyError, "Error: cannot merge comments without id" if id.blank? or merge_id.blank?
 
-      com_id = Comment.find(:all, :conditions => [ "article_id = ?", self.id])
+      com_id = Comment.find(:all, :conditions => [ "article_id = ?", id])
       com_merge_id = Comment.find(:all, :conditions => [ "article_id = ?", merge_id])
     comment = com_merge_id
     comment = com_id.zip(com_merge_id).flatten.compact unless com_id.empty?

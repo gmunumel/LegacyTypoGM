@@ -422,19 +422,20 @@ class Article < Content
   class Article::InvalidKeyError < StandardError; end
   class Article::EqualKeyError < StandardError; end
 
-  def merge_with(merge_id)
-    raise Article::EqualKeyError, "Error: cannot merge articles with the same id" if self.id == merge_id
-    raise Article::InvalidKeyError, "Error: cannot merge articles without id" if self.id.blank? or merge_id.blank?
+  def self.merge_with(id, merge_id)
+    raise Article::EqualKeyError, "Error: cannot merge articles with the same id" if id == merge_id
+    raise Article::InvalidKeyError, "Error: cannot merge articles without id" if id.blank? or merge_id.blank?
    
     begin
+      art_id = Article.find(id)
       art_merge = Article.find(merge_id)
     rescue ActiveRecord::RecordNotFound
       raise Article::InvalidKeyError, "Error: not record found with merge id"
     end 
 
     article = Article.new()
-    article.title = self.title << " " << art_merge.title
-    article.body = self.body << " " << art_merge.body
+    article.title = art_id.title << " " << art_merge.title
+    article.body = art_id.body << " " << art_merge.body
     article.author = art_merge.author
     article
   end
