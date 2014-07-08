@@ -27,19 +27,18 @@ class Admin::ContentController < Admin::BaseController
     new_or_edit
   end
 
-  # added by gabriel muñumel
-  # action to merge two articles
+  #
+  # Author: gabriel muñumel
+  # Description: Action to merge two articles. 
+  # First call the article part and then
+  # the comments
+  #
   def merge 
     id = params[:id]
     merge_id = params[:merge_with]
-    @article = Article.merge_with id, merge_id
-    @article.user_id = current_user
-    @article.state = "published"
-    @article.save
-    @comment = Comment.merge_with id, merge_id
-    @comment.map { |i| i.attributes = { article_id:  @article.id }}
-    @comment.map! { |i| i.attributes }
-    Comment.create(@comment) unless @comment.empty?
+    merge_articles id, merge_id
+    merge_comments_article id, merge_id
+    # remove unnecesary comments
     Article.find(id).destroy
     Article.find(merge_id).destroy
 
@@ -135,6 +134,30 @@ class Admin::ContentController < Admin::BaseController
 
   protected
 
+  #
+  # Author: gabriel muñumel
+  # Description: merge two articles
+  # and return the new article merged
+  #
+  def merge_articles id, merge_id
+    @article = Article.merge_with id, merge_id
+    @article.user_id = current_user
+    @article.state = "published"
+    @article.save
+  end
+
+  #
+  # Author: gabriel muñumel
+  # Description: create new comments related to
+  # two articles 
+  #
+  def merge_comments_article id, merge_id
+    @comment = Comment.merge_with id, merge_id
+    @comment.map { |i| i.attributes = { article_id:  @article.id }}
+    @comment.map! { |i| i.attributes }
+    Comment.create(@comment) unless @comment.empty?
+  end
+  
   def get_fresh_or_existing_draft_for_article
     if @article.published and @article.id
       parent_id = @article.id
@@ -161,6 +184,7 @@ class Admin::ContentController < Admin::BaseController
 
   def new_or_edit
     # added by gabriel munumel
+    # cannot merge arcticles non-admin users
     @profile_admin = lambda{current_user.profile_id == 1}.call
     # end
     id = params[:id]
